@@ -29,7 +29,7 @@
  *     2. A timeout Promise that rejects after timeoutMs with
  *        Error message "Bahut der ho gayi, chai nahi bani!"
  *   - If chai is ready before timeout: resolves with chai order
- *   - If timeout fires first: rejects with timeout error
+ *   - If timeout fires first: reje v cts with timeout error
  *
  * Function: processChaiQueue(orders)
  *   - Takes array of { type, quantity } objects
@@ -73,17 +73,87 @@
  *   // ]
  */
 export function orderChai(type, quantity) {
-  // Your code here
-}
+  return new Promise((resolve, reject) => {
 
+    const prices = { cutting: 10, special: 20, ginger: 15, masala: 25 };
+
+    if (!prices[type]) {
+      return reject(new Error("Yeh chai available nahi hai!"));
+    }
+
+    if (typeof quantity !== "number" || quantity <= 0) {
+      return reject(new Error("Kitni chai chahiye bhai?"));
+    }
+
+    setTimeout(() => {
+      const total = prices[type] * quantity;
+
+      resolve({
+        type,
+        quantity,
+        total
+      });
+    }, 100); 
+
+  });
+}
 export function checkIngredients(ingredient) {
-  // Your code here
+  return new Promise((resolve, reject) => {
+
+    const availableItems = ["tea", "milk", "sugar", "ginger", "cardamom"];
+
+    if (availableItems.includes(ingredient)) {
+      resolve({
+        ingredient,
+        available: true
+      });
+    } else {
+      reject(new Error(`${ingredient} khatam ho gaya!`));
+    }
+
+  });
 }
 
 export function prepareChaiWithTimeout(type, timeoutMs) {
-  // Your code here
+
+  const chaiPromise = orderChai(type, 1);
+
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => {
+      reject(new Error("Bahut der ho gayi, chai nahi bani!"));
+    }, timeoutMs);
+  });
+
+  return Promise.race([chaiPromise, timeoutPromise]);
 }
 
 export function processChaiQueue(orders) {
-  // Your code here
+  
+  return new Promise((resolve)=>{
+    if(!orders.lenght0){
+      return resolve([]);
+    }
+    const result=[];
+    let completed=0;
+    orders.forEach((orders,index) => {
+      orderChai(order.type,order.quantity)
+      .then((data)=>{
+        results[index]={
+          status:"fulfilled",
+          value:data,
+
+        };
+      }).catch((error)=>{
+        results[index]={
+          status:"Rejected",
+          reason:error.message
+        }
+      }).finally(()=>{
+        completed++;
+        if (completed===orders.lenght){
+          resolve(result);
+        }
+      })
+    });
+  })
 }
