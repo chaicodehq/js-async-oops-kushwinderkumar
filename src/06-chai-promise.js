@@ -128,32 +128,37 @@ export function prepareChaiWithTimeout(type, timeoutMs) {
 }
 
 export function processChaiQueue(orders) {
-  
-  return new Promise((resolve)=>{
-    if(!orders.lenght0){
+  return new Promise((resolve) => {
+
+    if (!Array.isArray(orders) || orders.length === 0) {
       return resolve([]);
     }
-    const result=[];
-    let completed=0;
-    orders.forEach((orders,index) => {
-      orderChai(order.type,order.quantity)
-      .then((data)=>{
-        results[index]={
-          status:"fulfilled",
-          value:data,
 
-        };
-      }).catch((error)=>{
-        results[index]={
-          status:"Rejected",
-          reason:error.message
-        }
-      }).finally(()=>{
-        completed++;
-        if (completed===orders.lenght){
-          resolve(result);
-        }
-      })
+    const results = [];
+    let completed = 0;
+
+    orders.forEach((order, index) => {
+      orderChai(order.type, order.quantity)
+        .then((data) => {
+          results[index] = {
+            status: "fulfilled",
+            value: data,
+          };
+        })
+        .catch((error) => {
+          results[index] = {
+            status: "rejected",
+            reason: error.message,
+          };
+        })
+        .finally(() => {
+          completed++;
+
+          if (completed === orders.length) {
+            resolve(results);
+          }
+        });
     });
-  })
+
+  });
 }
